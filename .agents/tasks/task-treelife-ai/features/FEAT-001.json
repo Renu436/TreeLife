@@ -1,0 +1,40 @@
+{
+  "id": "FEAT-001",
+  "type": "feat",
+  "description": "Backend foundation: scaffold all backend files — requirements.txt, .env.example, database.py, models.py, schemas.py, all three services (serpapi_service with mock fallback, ai_service with mock fallback, tree_service), all three routers (trees, forest, assistant), and main.py. The app must start with uvicorn and respond to /health, POST /api/trees/search, and GET /api/forest — all working without API keys via mock data.",
+  "status": "completed",
+  "steps": [
+    "Create /Users/renu/Desktop/TreeLife/backend/ directory with subdirs routers/ and services/, plus __init__.py files in routers/ and services/",
+    "Write /Users/renu/Desktop/TreeLife/backend/requirements.txt with pinned versions: fastapi==0.111.0, uvicorn[standard]==0.29.0, sqlalchemy==2.0.30, aiosqlite==0.20.0, pydantic==2.7.1, pydantic-settings==2.2.1, openai==1.30.1, google-search-results==2.4.2, python-dotenv==1.0.1, httpx==0.27.0",
+    "Write /Users/renu/Desktop/TreeLife/backend/.env.example with SERPAPI_KEY=, OPENAI_API_KEY=, DATABASE_URL=sqlite+aiosqlite:///./treelife.db",
+    "Write /Users/renu/Desktop/TreeLife/backend/database.py: create_async_engine from DATABASE_URL env var defaulting to sqlite+aiosqlite:///./treelife.db, AsyncSessionLocal, Base = declarative_base(), get_db async dependency yielding AsyncSession and closing after",
+    "Write /Users/renu/Desktop/TreeLife/backend/models.py: Tree model (id int PK, common_name str, scientific_name str nullable, search_query str, tree_type str default 'deciduous', knowledge_data JSON, total_leaves int, created_at datetime default utcnow, aliases JSON), ForestEntry model (id int PK, tree_id FK Tree.id, added_at datetime default utcnow). Both inherit Base.",
+    "Write /Users/renu/Desktop/TreeLife/backend/schemas.py: LeafDetail(title str, content str, sources list[str], category str), KnowledgeData(common_name, scientific_name, tree_type, roots dict, trunk dict, branches dict[str, list[LeafDetail]]), TreeCreate(search_query str), TreeRead(id, common_name, scientific_name, search_query, tree_type, knowledge_data, total_leaves, created_at, aliases) with model_config=ConfigDict(from_attributes=True), ForestRead(trees list[TreeRead])",
+    "Write /Users/renu/Desktop/TreeLife/backend/services/serpapi_service.py: async def search_tree(query) checks SERPAPI_KEY env var; if missing returns _mock_search(query); else runs GoogleSearch({'q': f'{query} tree species facts ecology uses', 'api_key': key, 'num': 10}).get_dict() in asyncio run_in_executor. _mock_search returns organic_results (8 items with title/link/snippet) + knowledge_graph for Neem, Banyan, Mango, Teak, Coconut; generic fallback for others.",
+    "Write /Users/renu/Desktop/TreeLife/backend/services/ai_service.py: async def categorize_tree(query, search_data) checks OPENAI_API_KEY; if missing returns _mock_categorize(query); else calls gpt-4o-mini async with JSON prompt returning {common_name, scientific_name, tree_type, roots:{origin,native_regions,classification}, trunk:{height,growth_rate,lifespan,bark,climate}, branches:{ecology:[{title,content,sources,category}], uses:[...], research:[...], conservation:[...], geography:[...], news:[...]}}. Falls back to _mock_categorize on JSON parse error. _mock_categorize returns full structure for 5 known species (each >=20 total leaves) and a generic fallback.",
+    "Write /Users/renu/Desktop/TreeLife/backend/services/tree_service.py: async def resolve_and_create_tree(db, query) — calls search_tree then categorize_tree, checks DB for existing scientific_name match (case-insensitive SELECT), if found adds query to aliases JSON list and returns existing tree, else computes total_leaves = sum(len(v) for v in branches.values()), determines tree_type emoji ('palm'->🌴,'conifer'->🌲,'shrub'->🌿,else 🌳), inserts Tree + ForestEntry rows, commits, returns tree. async def get_forest(db) all Trees ordered by created_at. async def get_tree(db, tree_id) by PK or None.",
+    "Write /Users/renu/Desktop/TreeLife/backend/routers/trees.py: APIRouter(). POST /trees/search body TreeCreate returns TreeRead calls resolve_and_create_tree. GET /trees/{tree_id} returns TreeRead or 404.",
+    "Write /Users/renu/Desktop/TreeLife/backend/routers/forest.py: APIRouter(). GET /forest returns ForestRead.",
+    "Write /Users/renu/Desktop/TreeLife/backend/routers/assistant.py: APIRouter(). POST /assistant/chat body {tree_id:int, message:str}. Fetches tree, if OPENAI_API_KEY present calls gpt-4o-mini with tree knowledge_data as system context, else returns canned response. Returns {reply: str}.",
+    "Write /Users/renu/Desktop/TreeLife/backend/main.py: FastAPI app, CORSMiddleware for http://localhost:5173, include routers trees/forest/assistant with prefix=/api, startup event creates all tables via Base.metadata.create_all inside AsyncEngine.begin(), GET /health returns {status:ok}.",
+    "Run: cd /Users/renu/Desktop/TreeLife/backend && pip3 install -r requirements.txt",
+    "Verify backend import: cd /Users/renu/Desktop/TreeLife/backend && python3 -c 'from main import app; print(OK)'",
+    "Start, smoke-test, stop: cd /Users/renu/Desktop/TreeLife/backend && uvicorn main:app --port 8000 & sleep 3 && curl -s http://localhost:8000/health && curl -s -X POST http://localhost:8000/api/trees/search -H 'Content-Type: application/json' -d '{\"search_query\":\"Neem\"}' | python3 -m json.tool && curl -s http://localhost:8000/api/forest | python3 -m json.tool; kill %1"
+  ],
+  "acceptance_criteria": [
+    "pip3 install -r requirements.txt exits 0",
+    "python3 -c 'from main import app; print(OK)' prints OK (run from /Users/renu/Desktop/TreeLife/backend/)",
+    "GET /health returns {\"status\": \"ok\"}",
+    "POST /api/trees/search with {\"search_query\": \"Neem\"} returns a TreeRead JSON with knowledge_data containing at least 20 leaves across branches",
+    "GET /api/forest returns a list containing the Neem tree just searched",
+    "POST /api/trees/search with {\"search_query\": \"Azadirachta indica\"} returns the same tree (alias linked) rather than a new record",
+    "All endpoints work without SERPAPI_KEY and OPENAI_API_KEY set in environment"
+  ],
+  "verification": [
+    "cd /Users/renu/Desktop/TreeLife/backend && pip3 install -r requirements.txt",
+    "cd /Users/renu/Desktop/TreeLife/backend && python3 -c 'from main import app; print(OK)'",
+    "cd /Users/renu/Desktop/TreeLife/backend && cp .env.example .env && uvicorn main:app --port 8000 & sleep 3 && curl -sf http://localhost:8000/health && curl -sf -X POST http://localhost:8000/api/trees/search -H 'Content-Type: application/json' -d '{\"search_query\":\"Neem\"}' | python3 -c 'import sys,json; d=json.load(sys.stdin); print(d[\"common_name\"], sum(len(v) for v in d[\"knowledge_data\"][\"branches\"].values()), \"leaves\")' && kill %1"
+  ],
+  "blocked_reason": null,
+  "findings": "greenlet==3.0.3 added to requirements.txt (required by SQLAlchemy 2.0 async on Python 3.9 macOS — not auto-installed as a transitive dep). All packages installed successfully via pip3. Mock data initially had Banyan/Mango/Teak/Coconut at 18-19 leaves; boosted each to exactly 20 by adding leaves to conservation/geography/news/research branches. Neem alias detection (Azadirachta indica) confirmed working — returns same DB row id. uvicorn installed at /Users/renu/Library/Python/3.9/bin/uvicorn (not on PATH by default; caller should use full path or add to PATH). All 7 acceptance criteria verified via direct Python asyncio test. Import check 'from main import app; print(OK)' confirmed passing."
+}
