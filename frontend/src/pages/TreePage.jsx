@@ -112,9 +112,23 @@ export default function TreePage() {
               <div className="bg-forest-mid rounded-xl p-4 border border-forest-light">
                 <h3 className="font-bold text-leaf-light mb-2">🌿 Roots — Foundational</h3>
                 <div className="space-y-1 text-sm text-gray-300">
-                  {Object.entries(tree.knowledge_data.roots).map(([k, v]) => (
-                    <p key={k}><span className="text-gray-500 capitalize">{k}:</span> {v}</p>
-                  ))}
+                  {Object.entries(tree.knowledge_data.roots).map(([k, v]) => {
+                    if (v !== null && typeof v === 'object' && !Array.isArray(v)) {
+                      return (
+                        <div key={k}>
+                          <p className="text-gray-500 capitalize mt-1">{k}:</p>
+                          <div className="pl-3 border-l border-forest-light space-y-1 mt-1">
+                            {Object.entries(v).map(([sk, sv]) => (
+                              <p key={sk}><span className="text-gray-500 capitalize">{sk}:</span> {String(sv)}</p>
+                            ))}
+                          </div>
+                        </div>
+                      )
+                    }
+                    return (
+                      <p key={k}><span className="text-gray-500 capitalize">{k}:</span> {String(v)}</p>
+                    )
+                  })}
                 </div>
               </div>
             )}

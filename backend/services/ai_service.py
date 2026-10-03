@@ -347,11 +347,13 @@ def _mock_categorize(query: str) -> dict:
                     {"title": "Ecological Role", "content": f"{common} plays a role in its local ecosystem by providing habitat and food sources for wildlife.", "sources": [f"https://example.com/{q}-ecology"], "category": "ecology"},
                     {"title": "Carbon Storage", "content": f"{common} contributes to carbon sequestration in its native forest ecosystem.", "sources": [f"https://example.com/{q}-ecology"], "category": "ecology"},
                     {"title": "Biodiversity Support", "content": f"{common} supports local biodiversity by providing food and habitat for insects, birds, and mammals.", "sources": [f"https://example.com/{q}-ecology"], "category": "ecology"},
+                    {"title": "Soil Health", "content": f"{common} contributes to soil health through leaf litter decomposition and root activity, supporting microbial communities in its native habitat.", "sources": [f"https://example.com/{q}-ecology"], "category": "ecology"},
                 ],
                 "uses": [
                     {"title": "Traditional Uses", "content": f"{common} has traditional uses in the communities where it naturally grows, including medicinal and material applications.", "sources": [f"https://example.com/{q}-uses"], "category": "uses"},
                     {"title": "Commercial Potential", "content": f"{common} has potential commercial applications that are being explored by researchers and industry.", "sources": [f"https://example.com/{q}-uses"], "category": "uses"},
                     {"title": "Timber", "content": f"The wood of {common} is used locally for construction and fuel.", "sources": [f"https://example.com/{q}-uses"], "category": "uses"},
+                    {"title": "Cultural Significance", "content": f"{common} holds cultural importance in communities within its native range, featuring in local traditions, festivals, and folk knowledge.", "sources": [f"https://example.com/{q}-uses"], "category": "uses"},
                 ],
                 "research": [
                     {"title": "Scientific Classification", "content": f"Scientific research has contributed to understanding the taxonomy and ecology of {common}.", "sources": [f"https://example.com/{q}-research"], "category": "research"},
@@ -371,6 +373,7 @@ def _mock_categorize(query: str) -> dict:
                 "news": [
                     {"title": "Recent Developments", "content": f"Recent news has highlighted the importance of {common} in regional biodiversity and conservation discussions.", "sources": [f"https://example.com/{q}-news"], "category": "news"},
                     {"title": "Research Findings", "content": f"New research findings on {common} have expanded understanding of its ecology and potential applications.", "sources": [f"https://example.com/{q}-news"], "category": "news"},
+                    {"title": "Conservation Spotlight", "content": f"{common} has recently gained attention from conservation organisations working to protect its native habitat from ongoing environmental pressures.", "sources": [f"https://example.com/{q}-news"], "category": "news"},
                 ],
             },
         }
