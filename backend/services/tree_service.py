@@ -8,16 +8,17 @@ from services.serpapi_service import search_tree
 from services.ai_service import categorize_tree
 
 
-def _tree_type_emoji(tree_type: str) -> str:
-    """Map tree_type string to emoji category."""
+def _tree_type_canonical(tree_type: str) -> str:
+    """Normalize tree_type to a plain-text canonical string for DB storage.
+    The frontend derives the emoji from this string."""
     t = tree_type.lower()
     if "palm" in t:
-        return "🌴"
-    if "conifer" in t:
-        return "🌲"
-    if "shrub" in t:
-        return "🌿"
-    return "🌳"
+        return "palm"
+    if "conifer" in t or "pine" in t:
+        return "conifer"
+    if "shrub" in t or "mangrove" in t:
+        return "shrub"
+    return "deciduous"
 
 
 async def resolve_and_create_tree(db: AsyncSession, query: str) -> Tree:
@@ -55,9 +56,9 @@ async def resolve_and_create_tree(db: AsyncSession, query: str) -> Tree:
     branches: dict = knowledge.get("branches", {})
     total_leaves = sum(len(v) for v in branches.values())
 
-    # 5. Determine tree_type (use emoji category as the stored tree_type string)
+    # 5. Determine tree_type (store plain-text canonical string; emoji is derived in the frontend)
     ai_type = knowledge.get("tree_type", "deciduous")
-    tree_type = _tree_type_emoji(ai_type)
+    tree_type = _tree_type_canonical(ai_type)
 
     # 6. Insert Tree row
     new_tree = Tree(
