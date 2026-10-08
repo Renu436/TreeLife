@@ -3,8 +3,8 @@
 import type { ChatReply, TreeEntity } from "./types";
 import { DEMO_ENTITIES, DEMO_SEED_FOREST, resolveDemo } from "./demo-data";
 
-const BASE = (import.meta.env.VITE_API_BASE_URL as string | undefined)?.replace(/\/$/, "");
-export const DEMO_MODE = import.meta.env.VITE_DEMO_MODE === "true" || !BASE;
+const BASE = (import.meta.env["VITE_API_BASE_URL"] as string | undefined)?.replace(/\/$/, "");
+export const DEMO_MODE = import.meta.env["VITE_DEMO_MODE"] === "true" || !BASE;
 
 export class ResearchError extends Error {
   constructor(message: string, public kind: "unavailable" | "unresolved" | "not_found" = "unavailable") {
@@ -81,12 +81,12 @@ function demoChat(message: string, forest: TreeEntity[]): ChatReply {
   const m = message.toLowerCase();
   const pick = (pred: (e: TreeEntity) => boolean) => forest.filter(pred);
   let hits: TreeEntity[] = forest.filter((e) => m.includes(e.common_name.toLowerCase()) || m.includes(e.id));
-  if (!hits.length && /tropic/.test(m)) hits = pick((e) => /tropic/i.test(e.facts?.Habitat ?? ""));
+  if (!hits.length && /tropic/.test(m)) hits = pick((e) => /tropic/i.test(e.facts?.["Habitat"] ?? ""));
   if (!hits.length && /medic/.test(m)) hits = pick((e) => (e.knowledge ?? []).some((k) => /medic/i.test(k.summary + k.title)));
-  if (!hits.length && /wetland|coast/.test(m)) hits = pick((e) => /wetland|coast/i.test(e.facts?.Habitat ?? ""));
+  if (!hits.length && /wetland|coast/.test(m)) hits = pick((e) => /wetland|coast/i.test(e.facts?.["Habitat"] ?? ""));
   if (!hits.length) hits = forest.slice(0, 3);
   const reply = hits.length
-    ? hits.map((e) => `${e.common_name}${e.scientific_name ? ` (${e.scientific_name})` : ""} — ${e.summary ?? ""} Habitat: ${e.facts?.Habitat ?? "not established"}.`).join("\n\n")
+    ? hits.map((e) => `${e.common_name}${e.scientific_name ? ` (${e.scientific_name})` : ""} — ${e.summary ?? ""} Habitat: ${e.facts?.["Habitat"] ?? "not established"}.`).join("\n\n")
     : "Your forest is still empty. Search something to grow your first tree.";
   return {
     reply,

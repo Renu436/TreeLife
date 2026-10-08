@@ -167,7 +167,7 @@ function build(s: Seed): TreeEntity {
     id: s.id,
     query: s.common_name,
     common_name: s.common_name,
-    scientific_name: s.scientific_name,
+    scientific_name: s.scientific_name ?? null,
     entity_type: s.entity_type,
     status: "demo",
     confidence: s.confidence,

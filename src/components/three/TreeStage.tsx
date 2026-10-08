@@ -23,7 +23,7 @@ export default function TreeStage({ profile, seedKey, grow, label }: { profile: 
       <Canvas shadows dpr={[1, 1.75]} camera={{ position: cam, fov: 42 }}>
         <Suspense fallback={null}>
           <Atmosphere wet={profile.growth_form === "mangrove"} />
-          <PlantRenderer profile={profile} seedKey={seedKey} grow={grow && !reduced} />
+          <PlantRenderer profile={profile} seedKey={seedKey} grow={!!grow && !reduced} />
         </Suspense>
         <OrbitControls target={target} enableDamping minDistance={size * 0.4} maxDistance={size * 3} maxPolarAngle={Math.PI * 0.49} autoRotate={!reduced} autoRotateSpeed={0.35} />
       </Canvas>
