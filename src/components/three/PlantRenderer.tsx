@@ -80,8 +80,8 @@ export const PlantRenderer = memo(function PlantRenderer({ profile, seedKey, det
 
   const leafGeo = useMemo(() => leafGeometry(profile.leaf_style), [profile.leaf_style]);
   const cylGeo = useMemo(() => new THREE.CylinderGeometry(0.72, 1, 1, detail === "low" ? 5 : 7, 1).translate(0, 0.5, 0), [detail]);
-  const palette = LEAF_PALETTES[profile.color_profile] ?? LEAF_PALETTES.seasonal_green;
-  const woodColor = WOOD_COLOR[profile.growth_form] ?? WOOD_COLOR.broadleaf_tree;
+  const palette = (LEAF_PALETTES[profile.color_profile] ?? LEAF_PALETTES["seasonal_green"]) as string[];
+  const woodColor = (WOOD_COLOR[profile.growth_form] ?? "#5e4a39") as string;
 
   const apply = (p: number) => {
     if (woodRef.current) writeSegs(woodRef.current, morph.wood, p);
@@ -102,7 +102,7 @@ export const PlantRenderer = memo(function PlantRenderer({ profile, seedKey, det
     if (leafRef.current) {
       const c = new THREE.Color();
       morph.leaves.forEach((l, i) => {
-        c.set(palette[Math.floor(l.c * palette.length) % palette.length]);
+        c.set(palette[Math.floor(l.c * palette.length) % palette.length] ?? "#4f6b3a");
         leafRef.current!.setColorAt(i, c);
       });
       if (leafRef.current.instanceColor) leafRef.current.instanceColor.needsUpdate = true;
@@ -124,7 +124,7 @@ export const PlantRenderer = memo(function PlantRenderer({ profile, seedKey, det
       </instancedMesh>
       {morph.fronds.length > 0 && (
         <instancedMesh ref={frondRef} args={[cylGeo, undefined, morph.fronds.length]} castShadow frustumCulled={false}>
-          <meshStandardMaterial color={palette[0]} roughness={0.8} />
+          <meshStandardMaterial color={palette[0] ?? "#4f6b3a"} roughness={0.8} />
         </instancedMesh>
       )}
       {morph.leaves.length > 0 && (
