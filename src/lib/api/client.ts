@@ -1,6 +1,7 @@
 // Isolated API service layer for the TreeLife FastAPI backend.
 // Secrets (SerpApi / OpenAI) live only on the backend — never here.
 import type { ChatReply, TreeEntity } from "./types";
+import { searchWikipedia } from "./wikipedia";
 import { DEMO_ENTITIES, DEMO_SEED_FOREST, resolveDemo } from "./demo-data";
 
 const BASE = (import.meta.env["VITE_API_BASE_URL"] as string | undefined)?.replace(/\/$/, "");
@@ -36,6 +37,17 @@ function demoIds(): string[] {
   if (!raw) return DEMO_SEED_FOREST;
   try { return JSON.parse(raw) as string[]; } catch { return DEMO_SEED_FOREST; }
 }
+const LIVE_KEY = "treelife.demo.live";
+function liveMap(): Record<string, TreeEntity> {
+  if (typeof window === "undefined") return {};
+  try { return JSON.parse(window.localStorage.getItem(LIVE_KEY) ?? "{}") as Record<string, TreeEntity>; } catch { return {}; }
+}
+function saveLive(e: TreeEntity) {
+  if (typeof window !== "undefined") window.localStorage.setItem(LIVE_KEY, JSON.stringify({ ...liveMap(), [e.id]: e }));
+}
+function findDemo(id: string): TreeEntity | undefined {
+  return DEMO_ENTITIES.find((e) => e.id === id) ?? liveMap()[id];
+}
 function saveDemo(ids: string[]) {
   if (typeof window !== "undefined") window.localStorage.setItem(KEY, JSON.stringify(ids));
 }
@@ -44,8 +56,11 @@ const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
 export const api = {
   async search(query: string): Promise<TreeEntity> {
     if (DEMO_MODE) {
-      await wait(4200);
-      const e = resolveDemo(query);
+      let e = resolveDemo(query);
+      if (!e) {
+        try { e = await searchWikipedia(query); } catch { throw new ResearchError("Couldn't reach Wikipedia to look this up. Check your connection."); }
+        if (e) saveLive(e);
+      } else await wait(1500);
       if (!e) throw new ResearchError("We couldn't establish a reliable research profile for this query.", "unresolved");
       const ids = demoIds().filter((i) => i !== e.id);
       saveDemo([...ids, e.id]);
@@ -55,14 +70,14 @@ export const api = {
   },
   async forest(): Promise<TreeEntity[]> {
     if (DEMO_MODE) {
-      return demoIds().map((id) => DEMO_ENTITIES.find((e) => e.id === id)).filter((e): e is TreeEntity => !!e);
+      return demoIds().map((id) => findDemo(id)).filter((e): e is TreeEntity => !!e);
     }
     const data = await http<TreeEntity[] | { trees: TreeEntity[] }>("/api/forest");
     return Array.isArray(data) ? data : data.trees ?? [];
   },
   async tree(id: string): Promise<TreeEntity> {
     if (DEMO_MODE) {
-      const e = DEMO_ENTITIES.find((x) => x.id === id);
+      const e = findDemo(id);
       if (!e) throw new ResearchError("This entity isn't in your forest.", "not_found");
       return e;
     }
