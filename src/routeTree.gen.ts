@@ -10,33 +10,63 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AssistantRouteImport } from './routes/assistant'
+import { Route as ForestRouteImport } from './routes/forest'
+import { Route as TreeIdRouteImport } from './routes/tree.$id'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AssistantRoute = AssistantRouteImport.update({
+  id: '/assistant',
+  path: '/assistant',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ForestRoute = ForestRouteImport.update({
+  id: '/forest',
+  path: '/forest',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TreeIdRoute = TreeIdRouteImport.update({
+  id: '/tree/$id',
+  path: '/tree/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/assistant': typeof AssistantRoute
+  '/forest': typeof ForestRoute
+  '/tree/$id': typeof TreeIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/assistant': typeof AssistantRoute
+  '/forest': typeof ForestRoute
+  '/tree/$id': typeof TreeIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/assistant': typeof AssistantRoute
+  '/forest': typeof ForestRoute
+  '/tree/$id': typeof TreeIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths: '/' | '/assistant' | '/forest' | '/tree/$id'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to: '/' | '/assistant' | '/forest' | '/tree/$id'
+  id: '__root__' | '/' | '/assistant' | '/forest' | '/tree/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AssistantRoute: typeof AssistantRoute
+  ForestRoute: typeof ForestRoute
+  TreeIdRoute: typeof TreeIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +78,35 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/assistant': {
+      id: '/assistant'
+      path: '/assistant'
+      fullPath: '/assistant'
+      preLoaderRoute: typeof AssistantRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/forest': {
+      id: '/forest'
+      path: '/forest'
+      fullPath: '/forest'
+      preLoaderRoute: typeof ForestRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tree/$id': {
+      id: '/tree/$id'
+      path: '/tree/$id'
+      fullPath: '/tree/$id'
+      preLoaderRoute: typeof TreeIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AssistantRoute: AssistantRoute,
+  ForestRoute: ForestRoute,
+  TreeIdRoute: TreeIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
