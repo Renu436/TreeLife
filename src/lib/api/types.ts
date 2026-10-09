@@ -66,16 +66,16 @@ export interface TreeEntity {
   id: string;
   query: string;
   common_name: string;
-  scientific_name?: string | null;
+  scientific_name?: string | null | undefined;
   entity_type: string;
   status: EntityStatus;
-  confidence?: string | null;
-  summary?: string;
-  taxonomy?: Taxonomy;
-  facts?: Record<string, string | null | undefined>;
-  visual_profile?: VisualProfile | null;
-  images?: ResearchImage[];
-  knowledge?: KnowledgeItem[];
+  confidence?: string | null | undefined;
+  summary?: string | undefined;
+  taxonomy?: Taxonomy | undefined;
+  facts?: Record<string, string | null | undefined> | undefined;
+  visual_profile?: VisualProfile | null | undefined;
+  images?: ResearchImage[] | undefined;
+  knowledge?: KnowledgeItem[] | undefined;
   created_at: string;
 }
 

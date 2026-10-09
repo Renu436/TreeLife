@@ -170,7 +170,7 @@ function build(s: Seed): TreeEntity {
     scientific_name: s.scientific_name ?? null,
     entity_type: s.entity_type,
     status: "demo",
-    confidence: s.confidence,
+    confidence: s.confidence ?? null,
     summary: s.summary,
     taxonomy: s.taxonomy,
     facts: s.facts,

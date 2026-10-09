@@ -78,16 +78,18 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lovable App" },
-      { name: "description", content: "Lovable Generated Project" },
-      { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "Lovable Generated Project" },
+      { title: "TreeLife AI — Research any tree in 3D" },
+      { name: "description", content: "Search any tree or plant, get a sourced research profile and explore it as an interactive 3D model." },
+      
+      { property: "og:title", content: "TreeLife AI" },
+      { property: "og:description", content: "Search any tree or plant, get a sourced research profile and explore it as an interactive 3D model." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:site", content: "@Lovable" },
+      
     ],
     links: [
+      { rel: "preconnect", href: "https://fonts.googleapis.com" },
+      { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400&display=swap" },
       {
         rel: "stylesheet",
         href: appCss,
@@ -121,6 +123,16 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
+      <header className="sticky top-0 z-20 border-b bg-background/80 backdrop-blur">
+        <nav className="mx-auto flex max-w-6xl items-center justify-between px-5 py-3 text-sm">
+          <Link to="/" className="font-serif text-xl">TreeLife<span className="text-gold"> AI</span></Link>
+          <div className="flex gap-6 text-muted-foreground">
+            <Link to="/" activeOptions={{ exact: true }} activeProps={{ className: "text-foreground" }}>Search</Link>
+            <Link to="/forest" activeProps={{ className: "text-foreground" }}>Forest</Link>
+            <Link to="/assistant" activeProps={{ className: "text-foreground" }}>TreeMind</Link>
+          </div>
+        </nav>
+      </header>
       <Outlet />
     </QueryClientProvider>
   );
