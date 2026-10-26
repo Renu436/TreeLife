@@ -1,23 +1,40 @@
-# Python
+# ── Secrets — NEVER commit ────────────────────────────────────────────────────
+.env
+*.env
+backend/.env
+
+# ── Python ────────────────────────────────────────────────────────────────────
 __pycache__/
 *.py[cod]
 *.pyo
 *.pyd
-.env
-*.env
+.venv/
+backend/.venv/
+backend/venv/
+venv/
+*.egg-info/
+
+# ── Database ──────────────────────────────────────────────────────────────────
 backend/treelife.db
+*.db
+*.sqlite3
 
-# Node
+# ── Node / Frontend ───────────────────────────────────────────────────────────
 node_modules/
+frontend/node_modules/
 frontend/dist/
+frontend/.output/
 frontend/.vite/
+frontend/node_modules/.nitro/
+.output/
 
-# OS
+# ── OS / Editor ───────────────────────────────────────────────────────────────
 .DS_Store
 Thumbs.db
-
-# Editor
 .vscode/
 .idea/
 *.swp
 *.swo
+
+# ── Agents / CI artifacts ─────────────────────────────────────────────────────
+.agents/
